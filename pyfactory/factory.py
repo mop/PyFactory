@@ -144,7 +144,7 @@ class FactoryElement(object):
         val = vals[1]
         if not isinstance(val, FactoryAttribute):
             return (key, val)
-        return (key, val())
+        return (key, val(self._method))
 
     def build(self):
         """
@@ -153,15 +153,16 @@ class FactoryElement(object):
         returns -- the built object is returned.
         """
         klass = self._fetch_class()
-        return klass(**self.attributes_for())
+        return klass(**self.attributes_for('build'))
 
-    def attributes_for(self):
+    def attributes_for(self, method='attributes_for'):
         """
         Returns an attribute-dictionary for the model-class.
 
         returns -- A dictionary containing all attributes of the class is
         returned.
         """
+        self._method = method
         return dict(map(self._filter_attributes, self.attributes.items()))
 
     def create(self):
@@ -171,7 +172,7 @@ class FactoryElement(object):
         returns -- the created object is returned.
         """
         klass = self._fetch_class()
-        obj = klass(**self.attributes_for())
+        obj = klass(**self.attributes_for('create'))
         obj.save()
         return obj
         
@@ -229,7 +230,7 @@ class Generator(FactoryAttribute):
     def __init__(self, callback):
         self._callback = callback
     
-    def __call__(self):
+    def __call__(self, type):
         return self._callback(UniqueIDGenerator.generate())
 
 class Foreign(FactoryAttribute):
@@ -240,8 +241,10 @@ class Foreign(FactoryAttribute):
     def __init__(self, factory_name):
         self.factory_name = factory_name
 
-    def __call__(self):
-        return Factory.build(self.factory_name)
+    def __call__(self, type):
+        method = getattr(Factory, type)
+        # e.g. Factory.build('user')
+        return method(self.factory_name)
     
 class UniqueIDGenerator(object):
     """

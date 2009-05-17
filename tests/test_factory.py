@@ -99,5 +99,17 @@ class FactoryGeneratorForeignAttributeTest(unittest.TestCase):
     def test_should_not_save_the_created_factory(self):
         self.assertEqual(self.object.first_name.saved, False)
 
+class FactoryGeneratorForeignAttributeTypesTest(unittest.TestCase):
+    def test_should_save_the_created_object_when_calling_create(self):
+        self.object = pyfactory.Factory.create('test_object_foreign')
+        self.assertEqual(self.object.first_name.saved, True)
+
+    def test_should_create_attributes_for_object_when_calling_create(self):
+        self.object = pyfactory.Factory.attributes_for('test_object_foreign')
+        self.assertEqual(
+            self.object['first_name']['first_name'], 
+            'the first name'
+        )
+
 if __name__ == '__main__':
     unittest.main()
