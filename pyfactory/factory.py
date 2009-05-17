@@ -53,38 +53,40 @@ class FactoryBuilder(object):
             }))
         return elems[0]
 
-    def build(self, name, **kwargs):
+    def build(self, factory_name, **kwargs):
         """
-        Builds (no save!) an object using the Factory with the given name. 
+        Builds (no save!) an object using the Factory with the given
+        factory_name. 
 
-        name -- the name of the factory, which should be used to build the
+        factory_name -- the name of the factory, which should be used to build the
         object.
         returns -- the created object.
         """
-        factory_object = self._find_factory(name)
+        factory_object = self._find_factory(factory_name)
         return factory_object.build(**kwargs)
 
-    def attributes_for(self, name, **kwargs):
+    def attributes_for(self, factory_name, **kwargs):
         """
         Returns a dictionary with the attributes for the object the Factory
-        with the given name would have created otherwise.
+        with the given factory_name would have created otherwise.
 
-        name -- the name of the factory, whose attributes should be returned
+        factory_name -- the name of the factory, whose attributes should be returned
         returns -- a dictionary with all the attributes for the object, which
         would have been created, is returned.
         """
-        factory_object = self._find_factory(name)
+        factory_object = self._find_factory(factory_name)
         return factory_object.attributes_for(**kwargs)
 
-    def create(self, name, **kwargs):
+    def create(self, factory_name, **kwargs):
         """
-        Creates (saves!) an object using the Factory with the given name.
+        Creates (saves!) an object using the Factory with the given
+        factory_name.
 
-        name -- the name of the factory, which should be used to create the
+        factory_name -- the name of the factory, which should be used to create the
         object.
         returns -- a saved object.
         """
-        factory_object = self._find_factory(name)
+        factory_object = self._find_factory(factory_name)
         return factory_object.create(**kwargs)
         
 # The global Factory-object
