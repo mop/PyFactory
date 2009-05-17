@@ -1,5 +1,10 @@
+import sys
+from os.path import dirname, join
+
+sys.path.insert(0, join(dirname(__file__), '..'))
+
 import unittest
-import factory
+import pyfactory.factory as factory
 import mock
 
 class Tester(object):
@@ -15,7 +20,7 @@ class Tester(object):
 class TestFactory(factory.FactoryObject):
     class Meta:
         name = 'test_object'
-        klass = 'tests.Tester'
+        klass = 'tests.test_factory.Tester'
 
     class Elements:
         first_name = 'the first name'
@@ -27,7 +32,7 @@ def generate_first_name(i):
 class TestFactoryGenerator(factory.FactoryObject):
     class Meta:
         name = 'test_object_generator'
-        klass = 'tests.Tester'
+        klass = 'tests.test_factory.Tester'
 
     class Elements:
         first_name = factory.Generator(generate_first_name)
@@ -36,7 +41,7 @@ class TestFactoryGenerator(factory.FactoryObject):
 class TestForeignGenerator(factory.FactoryObject):
     class Meta:
         name  = 'test_object_foreign'
-        klass = 'tests.Tester'
+        klass = 'tests.test_factory.Tester'
     class Elements:
         first_name = factory.Foreign('test_object')
         last_name  = 'the last name'
