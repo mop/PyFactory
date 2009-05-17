@@ -111,5 +111,28 @@ class FactoryGeneratorForeignAttributeTypesTest(unittest.TestCase):
             'the first name'
         )
 
+class FactoryOverridingAttributesTest(unittest.TestCase):
+    def test_should_override_the_given_attributes_on_build(self):
+        self.object = pyfactory.Factory.build(
+            'test_object',
+            first_name='overridden'
+        )
+        self.assertEqual(self.object.first_name, 'overridden')
+
+    def test_should_override_the_given_attributes_on_create(self):
+        self.object = pyfactory.Factory.create(
+            'test_object',
+            first_name='overridden'
+        )
+        self.assertEqual(self.object.first_name, 'overridden')
+
+    def test_should_override_the_given_attributes_on_attributes_for(self):
+        self.object = pyfactory.Factory.attributes_for(
+            'test_object',
+            first_name='overridden'
+        )
+        self.assertEqual(self.object['first_name'], 'overridden')
+
+
 if __name__ == '__main__':
     unittest.main()

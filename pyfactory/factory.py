@@ -53,7 +53,7 @@ class FactoryBuilder(object):
             }))
         return elems[0]
 
-    def build(self, name):
+    def build(self, name, **kwargs):
         """
         Builds (no save!) an object using the Factory with the given name. 
 
@@ -62,9 +62,9 @@ class FactoryBuilder(object):
         returns -- the created object.
         """
         factory_object = self._find_factory(name)
-        return factory_object.build()
+        return factory_object.build(**kwargs)
 
-    def attributes_for(self, name):
+    def attributes_for(self, name, **kwargs):
         """
         Returns a dictionary with the attributes for the object the Factory
         with the given name would have created otherwise.
@@ -74,9 +74,9 @@ class FactoryBuilder(object):
         would have been created, is returned.
         """
         factory_object = self._find_factory(name)
-        return factory_object.attributes_for()
+        return factory_object.attributes_for(**kwargs)
 
-    def create(self, name):
+    def create(self, name, **kwargs):
         """
         Creates (saves!) an object using the Factory with the given name.
 
@@ -85,7 +85,7 @@ class FactoryBuilder(object):
         returns -- a saved object.
         """
         factory_object = self._find_factory(name)
-        return factory_object.create()
+        return factory_object.create(**kwargs)
         
 # The global Factory-object
 Factory = FactoryBuilder()
@@ -142,20 +142,24 @@ class FactoryElement(object):
         """
         key = vals[0]
         val = vals[1]
+
+        if key in self._override:
+            val = self._override[key]
+
         if not isinstance(val, FactoryAttribute):
             return (key, val)
         return (key, val(self._method))
 
-    def build(self):
+    def build(self, **kwargs):
         """
         Builds the object using the given meta-data.
 
         returns -- the built object is returned.
         """
         klass = self._fetch_class()
-        return klass(**self.attributes_for('build'))
+        return klass(**self.attributes_for('build', **kwargs))
 
-    def attributes_for(self, method='attributes_for'):
+    def attributes_for(self, method='attributes_for', **kwargs):
         """
         Returns an attribute-dictionary for the model-class.
 
@@ -163,16 +167,17 @@ class FactoryElement(object):
         returned.
         """
         self._method = method
+        self._override = kwargs
         return dict(map(self._filter_attributes, self.attributes.items()))
 
-    def create(self):
+    def create(self, **kwargs):
         """
         Creates the object using the given meta-data.
 
         returns -- the created object is returned.
         """
         klass = self._fetch_class()
-        obj = klass(**self.attributes_for('create'))
+        obj = klass(**self.attributes_for('create', **kwargs))
         obj.save()
         return obj
         
