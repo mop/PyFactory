@@ -1,10 +1,5 @@
-import sys
-from os.path import dirname, join
-
-sys.path.insert(0, join(dirname(__file__), '..'))
-
 import unittest
-import pyfactory.factory as factory
+import pyfactory
 import mock
 
 class Tester(object):
@@ -17,7 +12,7 @@ class Tester(object):
     def save(self):
         self.saved = True
 
-class TestFactory(factory.FactoryObject):
+class TestFactory(pyfactory.FactoryObject):
     class Meta:
         name = 'test_object'
         klass = 'tests.test_factory.Tester'
@@ -29,27 +24,27 @@ class TestFactory(factory.FactoryObject):
 def generate_first_name(i):
     return "first name {num}".format(num=i)
 
-class TestFactoryGenerator(factory.FactoryObject):
+class TestFactoryGenerator(pyfactory.FactoryObject):
     class Meta:
         name = 'test_object_generator'
         klass = 'tests.test_factory.Tester'
 
     class Elements:
-        first_name = factory.Generator(generate_first_name)
+        first_name = pyfactory.Generator(generate_first_name)
         last_name  = 'the last name'
 
-class TestForeignGenerator(factory.FactoryObject):
+class TestForeignGenerator(pyfactory.FactoryObject):
     class Meta:
         name  = 'test_object_foreign'
         klass = 'tests.test_factory.Tester'
     class Elements:
-        first_name = factory.Foreign('test_object')
+        first_name = pyfactory.Foreign('test_object')
         last_name  = 'the last name'
     
 
 class FactoryBuildTest(unittest.TestCase):
     def setUp(self):
-        self.object = factory.Factory.build('test_object')
+        self.object = pyfactory.Factory.build('test_object')
 
     def test_should_set_testers_first_name(self):
         self.assertEqual(self.object.first_name, 'the first name')
@@ -62,7 +57,7 @@ class FactoryBuildTest(unittest.TestCase):
 
 class FactoryAttributeTest(unittest.TestCase):
     def setUp(self):
-        self.attributes = factory.Factory.attributes_for('test_object')
+        self.attributes = pyfactory.Factory.attributes_for('test_object')
 
     def test_should_return_first_name(self):
         self.assertEqual(self.attributes['first_name'], 'the first name')
@@ -72,7 +67,7 @@ class FactoryAttributeTest(unittest.TestCase):
 
 class FactoryCreateTest(unittest.TestCase):
     def setUp(self):
-        self.object = factory.Factory.create('test_object')
+        self.object = pyfactory.Factory.create('test_object')
 
     def test_should_set_testers_first_name(self):
         self.assertEqual(self.object.first_name, 'the first name')
@@ -85,16 +80,15 @@ class FactoryCreateTest(unittest.TestCase):
         
 class FactoryGeneratorAttributeTest(unittest.TestCase):
     def setUp(self):
-        self.object1 = factory.Factory.build('test_object_generator')
-        self.object2 = factory.Factory.build('test_object_generator')
+        self.object1 = pyfactory.Factory.build('test_object_generator')
+        self.object2 = pyfactory.Factory.build('test_object_generator')
 
     def test_should_set_testers_first_name_uniquely(self):
-        self.assertEqual(self.object1.first_name, 'first name 1')
-        self.assertEqual(self.object2.first_name, 'first name 2')
+        self.assertNotEqual(self.object1.first_name, self.object2.first_name)
 
 class FactoryGeneratorForeignAttributeTest(unittest.TestCase):
     def setUp(self):
-        self.object = factory.Factory.build('test_object_foreign')
+        self.object = pyfactory.Factory.build('test_object_foreign')
         
     def test_should_generate_another_factory_object(self):
         self.assert_(isinstance(self.object.first_name, Tester))
