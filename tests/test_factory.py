@@ -5,12 +5,16 @@ import mock
 class Tester(object):
     """This class represents the model class"""
     def __init__(self, **kwargs):
-        self.saved = False
+        self.saved   = False
+        self.has_put = False
         for key, val in kwargs.items():
             setattr(self, key, val)
 
     def save(self):
         self.saved = True
+
+    def put(self):
+        self.has_put = True
 
 class TestFactory(pyfactory.FactoryObject):
     class Meta:
@@ -22,7 +26,7 @@ class TestFactory(pyfactory.FactoryObject):
         last_name  = 'the last name'
 
 def generate_first_name(i):
-    return "first name {num}".format(num=i)
+    return "first name %d" % i
 
 class TestFactoryGenerator(pyfactory.FactoryObject):
     class Meta:
@@ -133,6 +137,14 @@ class FactoryOverridingAttributesTest(unittest.TestCase):
         )
         self.assertEqual(self.object['first_name'], 'overridden')
 
+class GoogleAppEngineTests(unittest.TestCase):
+    def setUp(self):
+        pyfactory.type = 'appengine'
+        self.result = pyfactory.Factory.create('test_object')
+
+    def test_should_call_put_instead_of_save_on_create(self):
+        self.assertFalse(self.result.saved)
+        self.assertTrue(self.result.has_put)
 
 if __name__ == '__main__':
     unittest.main()

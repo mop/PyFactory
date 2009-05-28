@@ -1,3 +1,4 @@
+import pyfactory
 # =========================================================================== 
 # Exceptions
 # =========================================================================== 
@@ -180,7 +181,9 @@ class FactoryElement(object):
         """
         klass = self._fetch_class()
         obj = klass(**self.attributes_for('create', **kwargs))
-        obj.save()
+
+        save_name = pyfactory.save_function()
+        getattr(obj, save_name)() # calls save/put on obj 
         return obj
         
 class FactoryInitializer(type):
